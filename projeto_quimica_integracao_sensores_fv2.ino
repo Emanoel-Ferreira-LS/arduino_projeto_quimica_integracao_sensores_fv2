@@ -170,6 +170,16 @@ void readSensorAPDS(){
 boolean configSensorAPDS() {
   // Inicializando sensor
   Wire.begin(); // Inicializando a comunicação I2C
+
+  apds.init();
+  
+  if (apds.enableLightSensor(true)) {
+      Serial.println("Sensor de Luz inicializado!");
+      return true;
+  }else{
+    return false;
+  }
+  /*
   if (apds.init()) {
     Serial.println("O sensor está funcionando agora");
 
@@ -184,7 +194,7 @@ boolean configSensorAPDS() {
   } else {
     Serial.println("Algo deu errado durante a inicialização do sensor");
   }
-  return false;  // Retorna falso se a inicialização falhar em qualquer ponto
+  return false;  // Retorna falso se a inicialização falhar em qualquer ponto*/
 }
 
 
