@@ -48,7 +48,10 @@ Adafruit_TSL2561_Unified tsl = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 1234
 void setup(){
    Serial.begin(9600);
 
-   Serial.println("Unidades de medições dos sensores disponiveis: 'APDS', 'TSL', 'RGB' e 'LDR'");
+   Serial.println("SEJA BEM VINDO!");
+   Serial.println("Sensores de Luminosidade e Cor Inicializados!");
+   Serial.println("ATENÇÃO: UNIDADES DE MEDIDAS DISPONIVEIS PARA OS SENSORES: 'APDS', 'TSL', 'RGB' e 'LDR'");
+   Serial.println("------------------------------------------------------------------------------------------\n");
 }
 
 
@@ -60,7 +63,10 @@ void loop(){
 
     value = dados.substring(0, espaco);//valor numerico da strind 
     uni = dados.substring(espaco+1);//valor da unidade da string(+1 carrega na variavel a parti do caractere " "(espaço)+1 da string, até o final
+    uni.toUpperCase();
 
+    String dataSensor;
+    
     //INDENTIFICANDO FUNÇÃO:
 /*--Lendo Sensor LDR--------------------------------------------------------------*/
     if(uni == "ldr" || uni == "LDR"){
@@ -68,12 +74,19 @@ void loop(){
 
       Serial.println("Lendo LDR...");
       //Loop para validar se ldr é diferente de 0 antes de imprimir
+      int cont;
+      
       while(ldr == 0){
         ldr = readSensorLDR();
+
+        if(cont >= 40){
+          break;
+        }
         delay(100);
+        cont++;
       }
-      
-      Serial.println(uni + ":" + "\t" + value + "\t"+ldr);
+
+      dataSensor = String(ldr);
 
 /*--Lendo Sensor RGB--------------------------------------------------------------*/
     }else if(uni == "rgb" || uni == "RGB"){
@@ -81,14 +94,21 @@ void loop(){
 
       Serial.println("Aguarde. Lendo Sensor RGB...");
       //loop para compensar o atraso de leitura e só imprimir quando ele retornar um valor 
+      int cont;
+      
       while(dataRGB == ""){
         //Serial.println("Buscando dados");
         dataRGB = readSensorRGB();
         //Serial.println(dataRGB);
+
+        if(cont >= 40){
+          break;
+        }
         delay(100);
+        cont++;
       }
 
-      Serial.println(uni + ":" + "\t" + value + "\t"+dataRGB);  
+      dataSensor = dataRGB;
       
 /*--Lendo Sensor TSL--------------------------------------------------------------*/
     }else if(uni == "tsl" || uni == "TSL"){
@@ -96,26 +116,48 @@ void loop(){
 
       Serial.println("Lendo TSL...");
       //if para verificar se não houve erro e só imprimir se estiver tudo certo
-      if(lux != ""){
-        Serial.println(uni + ":" + "\t" + value + "\t"+lux);
-      }
+      int cont;
       
+      while(lux != ""){
+         lux = readSensorTSL();
+
+        if(cont >= 40){
+          break;
+        }
+        delay(100);
+        cont++;
+      }
+
+      dataSensor = lux;
 /*--Lendo Sensor APDS--------------------------------------------------------------*/
     }else if(uni == "apds" || uni == "APDS"){
       String dataAPDS = readSensorAPDS();
+      int cont;
 
       while(dataAPDS == ""){
         dataAPDS = readSensorAPDS();
+
+        if(cont >= 40){
+          break;
+        }
         delay(100);
+        cont++;
       }
-      
-      Serial.println(uni + ":" + "\t" + value + "\t"+dataAPDS);
-       
+
+      dataSensor = dataAPDS;
+/*--INPUT INVALIDO OU NÃO INDENTIFICADO-----------------------------------------------*/     
     }else{
       Serial.println("Input invalido");
     }
 /*--TERMINO DE LEITURAS--------------------------------------------------------------*/
-
+    Serial.println(".....................................................................................");
+    if(dataSensor == ""){
+      Serial.println("Algo deu errado! Tente novamente");
+    }else{
+      Serial.println(uni + ":" + "\t" + value + "\t"+dataSensor);
+    }
+    Serial.println(".....................................................................................\n");
+    
     delay(1000);
   }  
 }
@@ -201,7 +243,7 @@ String readSensorAPDS(){
           !apds.readBlueLight(blue_light) ) {
       Serial.println("Erro ao ler os valores de luz");
     } else {
-      dataAPDS = "Ambiente: " + String(ambient_light) + "  RGB[" + String(red_light) + "," + String(green_light) + "," + String(blue_light) + "]";
+      dataAPDS = "Ambiente: " + String(ambient_light) + "\tRGB[" + String(red_light) + "," + String(green_light) + "," + String(blue_light) + "]";
       
       disableSensorAPDS();
       return dataAPDS;
