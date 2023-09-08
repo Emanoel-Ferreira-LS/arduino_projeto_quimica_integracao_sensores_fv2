@@ -66,8 +66,16 @@ void loop(){
       Serial.print(uni + ":" + "\t" + value + "\t");
       readSensorLDR();
     }else if(uni == "rgb" || uni == "RGB"){
+      int dataRGB = readSensorRGB();
+
+      while(dataRGB <= 0){
+        dataRGB = readSensorRGB();
+        delay(100);
+      }
+
       Serial.print(uni + ":" + "\t" + value + "\t");
-      readSensorRGB();
+      Serial.println(String(dataRGB));
+      
     }else if(uni == "tsl" || uni == "TSL"){
       Serial.print(uni + ":" + "\t" + value + "\t");
       readSensorTSL();
@@ -87,11 +95,13 @@ void readSensorLDR(){
   Serial.println(ldr);
 }
 
-void readSensorRGB(){
+int readSensorRGB(){
  //Config:
  CS.begin();//inicializando sensor
 
  static  bool  waiting;
+
+ String rgbString;
  
   if (!waiting)
   {
@@ -110,12 +120,13 @@ void readSensorRGB(){
       int green = rgb.value[TCS230_RGB_G];
       int blue = rgb.value[TCS230_RGB_B];
   
-      String rgbString = "RGB [" + String(red) + "," + String(green) + "," + String(blue) + "]";
-      Serial.println(rgbString);
+      rgbString = "RGB [" + String(red) + "," + String(green) + "," + String(blue) + "]";
+      //Serial.println(rgbString);
       
       waiting = false;
     }
   }
+  return rgbString.toInt();
 }
 
 void readSensorTSL(){
@@ -179,7 +190,7 @@ boolean configSensorAPDS() {
   }else{
     return false;
   }
-  /*
+  /*ANTIGO CÓDIGO:
   if (apds.init()) {
     Serial.println("O sensor está funcionando agora");
 
