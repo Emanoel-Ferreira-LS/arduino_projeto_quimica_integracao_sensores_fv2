@@ -28,7 +28,7 @@
 #define  OE_OUT   8    // LOW = ENABLED
 //OUT => Pino 5~
 
-String dados, uni, value,rgbData;
+String dados, uni, value, desc,rgbData;
 char espaco;
 
 
@@ -48,21 +48,27 @@ Adafruit_TSL2561_Unified tsl = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 1234
 void setup(){
    Serial.begin(9600);
 
-   Serial.println("SEJA BEM VINDO!");
-   Serial.println("Sensores de Luminosidade e Cor Inicializados!");
-   Serial.println("ATENÇÃO: UNIDADES DE MEDIDAS DISPONIVEIS PARA OS SENSORES: 'APDS', 'TSL', 'RGB' e 'LDR'");
-   Serial.println("------------------------------------------------------------------------------------------\n");
+   Serial.println(F("SEJA BEM VINDO!"));
+   Serial.println(F("Sensores Inicializados!"));
+   Serial.println(F("ATENÇÃO: UNIDADES DE MEDIDAS DISPONIVEIS PARA OS SENSORES: 'APDS', 'TSL', 'RGB' e 'LDR'."));
+   Serial.println(F("Exemplo, siga esse modelo: '50 RGB'"));
+   Serial.println(F("----------------------------------------------------------------------------------------\n"));
 }
 
 
 void loop(){
   if(Serial.available() > 0){
     dados = Serial.readStringUntil('\n');//Lendo inputs da porta serial
+    //Serial.println(dados);
 
     espaco = dados.indexOf(' ');//quebrando a string até o espaço ' '
+    //Serial.println(espaco);
 
-    value = dados.substring(0, espaco);//valor numerico da strind 
+    value = dados.substring(0, espaco);//valor numerico da string
+     // Serial.println(value);
+      
     uni = dados.substring(espaco+1);//valor da unidade da string(+1 carrega na variavel a parti do caractere " "(espaço)+1 da string, até o final
+      
     uni.toUpperCase();
 
     String dataSensor;
@@ -72,7 +78,7 @@ void loop(){
     if(uni == "ldr" || uni == "LDR"){
       int ldr = readSensorLDR();
 
-      Serial.println("Lendo LDR...");
+      Serial.println(F("Lendo LDR..."));
       //Loop para validar se ldr é diferente de 0 antes de imprimir
       int cont;
       
@@ -92,7 +98,7 @@ void loop(){
     }else if(uni == "rgb" || uni == "RGB"){
       String dataRGB = readSensorRGB();
 
-      Serial.println("Aguarde. Lendo Sensor RGB...");
+      Serial.println(F("Aguarde. Lendo Sensor RGB..."));
       //loop para compensar o atraso de leitura e só imprimir quando ele retornar um valor 
       int cont;
       
@@ -150,13 +156,13 @@ void loop(){
       Serial.println("Input invalido");
     }
 /*--TERMINO DE LEITURAS--------------------------------------------------------------*/
-    Serial.println(".....................................................................................");
+    Serial.println(F("_______________________________________________________________________________________"));
     if(dataSensor == ""){
-      Serial.println("Algo deu errado! Tente novamente");
+      Serial.println(F("Algo deu errado! Tente novamente"));
     }else{
       Serial.println(uni + ":" + "\t" + value + "\t"+dataSensor);
     }
-    Serial.println(".....................................................................................\n");
+    Serial.println(F("_______________________________________________________________________________________\n"));
     
     delay(1000);
   }  
@@ -222,11 +228,11 @@ String readSensorTSL(){
       else{
         /* Se event.light = 0 lux, o sensor está provavelmente saturado
            e nenhum dado confiável pôde ser gerado! */
-        Serial.println("Sobrecarga do sensor");
+        Serial.println(F("Sobrecarga do sensor"));
       }
     
   }else{
-    Serial.println("Erro na inicialização do sensor TSL2561!");
+    Serial.println(F("Erro na inicialização do sensor TSL2561!"));
   }
   return "";
   disableSensorTSL();
@@ -249,7 +255,7 @@ String readSensorAPDS(){
       return dataAPDS;
     }
   }else{
-    Serial.println("Algo deu errado durante a inicialização dos sensores de Luz!");
+    Serial.println(F("Algo deu errado durante a inicialização dos sensores de Luz!"));
   }
   disableSensorAPDS();
   return "";
@@ -262,27 +268,11 @@ boolean configSensorAPDS() {
   apds.init();
   
   if (apds.enableLightSensor(true)) {
-      Serial.println("Sensor de Luz inicializado!");
+      Serial.println(F("Sensor de Luz inicializado!"));
       return true;
   }else{
     return false;
   }
-  /*ANTIGO CÓDIGO:
-  if (apds.init()) {
-    Serial.println("O sensor está funcionando agora");
-
-    apds.enableGestureSensor(false);     // Desativando Sensor de Gestos
-    apds.enableProximitySensor(false);   // Desativando Sensor de Proximidade
-
-    //Erro: essa biblioteca não dá suporte ao sensor de luz ou está com problemas
-    if (apds.enableLightSensor(true)) {
-      Serial.println("Sensor de Luz inicializado!");
-      return true;
-    }
-  } else {
-    Serial.println("Algo deu errado durante a inicialização do sensor");
-  }
-  return false;  // Retorna falso se a inicialização falhar em qualquer ponto*/
 }
 
 
