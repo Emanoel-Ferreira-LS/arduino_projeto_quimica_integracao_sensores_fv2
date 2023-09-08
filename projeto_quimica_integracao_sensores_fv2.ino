@@ -68,13 +68,16 @@ void loop(){
     }else if(uni == "rgb" || uni == "RGB"){
       int dataRGB = readSensorRGB();
 
+      Serial.println("Aguarde. Lendo Sensor RGB...");
       while(dataRGB <= 0){
+        Serial.println("Buscando dados");
         dataRGB = readSensorRGB();
+        Serial.println(dataRGB);
         delay(100);
       }
 
       Serial.print(uni + ":" + "\t" + value + "\t");
-      Serial.println(String(dataRGB));
+      Serial.println(String(dataRGB));  
       
     }else if(uni == "tsl" || uni == "TSL"){
       Serial.print(uni + ":" + "\t" + value + "\t");
