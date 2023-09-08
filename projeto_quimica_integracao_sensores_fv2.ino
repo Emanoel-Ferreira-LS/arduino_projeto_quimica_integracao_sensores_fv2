@@ -124,7 +124,7 @@ int readSensorRGB(){
       int blue = rgb.value[TCS230_RGB_B];
   
       rgbString = "RGB [" + String(red) + "," + String(green) + "," + String(blue) + "]";
-      //Serial.println(rgbString);
+      Serial.println("valor:"+rgbString);
       
       waiting = false;
     }
